@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 
 # ===== CONFIGURATION =====
-YOUR_EMAIL = "jasraj.johal@purolator.com"  # Replace with your work email
+YOUR_EMAIL = "example@example.com"  # Replace with your work email
 LOOP_SLEEP_MS = 180000  # 3 minutes
 RUN_HOURS = 8
 SESSION_FILE = "teams_session_backup.json"
@@ -200,14 +200,17 @@ def main():
                 except Exception as e:
                     consecutive_failures += 1
                     print(f"Error editing message: {e}")
-                    
+
                     if consecutive_failures >= 3:
-                        print(f"\n⚠ Failed {consecutive_failures} times in a row. Session may have expired.")
-                        print("Please run save_session.py again to refresh your session, then restart the bot.")
+                        print(
+                            f"\n⚠ Failed {consecutive_failures} times in a row. Session may have expired.")
+                        print(
+                            "Please run save_session.py again to refresh your session, then restart the bot.")
                         browser.close()
                         return
-                    
-                    print(f"Retrying in 10 seconds... (Attempt {consecutive_failures}/3)")
+
+                    print(
+                        f"Retrying in 10 seconds... (Attempt {consecutive_failures}/3)")
                     time.sleep(10)
 
             print(f"\nDone! Updated message {cycle_count} times total.")
