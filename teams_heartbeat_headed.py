@@ -72,6 +72,7 @@ def main():
 
             end_time = time.time() + RUN_HOURS * 60 * 60
             cycle_count = 0
+            consecutive_failures = 0
 
             while time.time() < end_time:
                 try:
@@ -126,6 +127,7 @@ def main():
                     done_button.click()
 
                     cycle_count += 1
+                    consecutive_failures = 0  # Reset failure count on success
                     if cycle_count % 10 == 0:
                         print(
                             f"Updated message {cycle_count} times... Current time: {current_time}")
@@ -133,8 +135,19 @@ def main():
                     page.wait_for_timeout(LOOP_SLEEP_MS)
 
                 except Exception as e:
+                    consecutive_failures += 1
                     print(f"Error editing message: {e}")
-                    print("Retrying in 10 seconds...")
+                    
+                    if consecutive_failures >= 3:
+                        print(f"\n⚠ Failed {consecutive_failures} times in a row.")
+                        print("You may have navigated away or Teams is showing a different view.")
+                        print("Navigate back to your self-chat and the bot will continue.")
+                        print(f"Retrying in 30 seconds...")
+                        time.sleep(30)
+                        consecutive_failures = 0  # Reset and try again
+                        continue
+                    
+                    print(f"Retrying in 10 seconds... (Attempt {consecutive_failures}/3)")
                     time.sleep(10)
 
             print(f"\nDone! Updated message {cycle_count} times total.")

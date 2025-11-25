@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 
 # ===== CONFIGURATION =====
-YOUR_EMAIL = "email@example.com"  # Replace with your work email
+YOUR_EMAIL = "jasraj.johal@purolator.com"  # Replace with your work email
 LOOP_SLEEP_MS = 180000  # 3 minutes
 RUN_HOURS = 8
 SESSION_FILE = "teams_session_backup.json"
@@ -135,6 +135,7 @@ def main():
 
             end_time = time.time() + RUN_HOURS * 60 * 60
             cycle_count = 0
+            consecutive_failures = 0
 
             while time.time() < end_time:
                 try:
@@ -189,6 +190,7 @@ def main():
                     done_button.click()
 
                     cycle_count += 1
+                    consecutive_failures = 0  # Reset failure count on success
                     if cycle_count % 10 == 0:
                         print(
                             f"Updated message {cycle_count} times... Current time: {current_time}")
@@ -196,8 +198,16 @@ def main():
                     page.wait_for_timeout(LOOP_SLEEP_MS)
 
                 except Exception as e:
+                    consecutive_failures += 1
                     print(f"Error editing message: {e}")
-                    print("Retrying in 10 seconds...")
+                    
+                    if consecutive_failures >= 3:
+                        print(f"\n⚠ Failed {consecutive_failures} times in a row. Session may have expired.")
+                        print("Please run save_session.py again to refresh your session, then restart the bot.")
+                        browser.close()
+                        return
+                    
+                    print(f"Retrying in 10 seconds... (Attempt {consecutive_failures}/3)")
                     time.sleep(10)
 
             print(f"\nDone! Updated message {cycle_count} times total.")
